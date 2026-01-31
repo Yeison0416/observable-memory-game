@@ -1,13 +1,26 @@
-import { Board as board } from '../../types/types';
-import { CellIndex, CellsToHighlight } from '../../types/types';
+import { CellIndex, GameStateStore, GameState } from '../../types/types';
 
 import { fromEvent } from 'rxjs';
 
-export function Board(cellsToHighlight: CellsToHighlight = []): board {
+export function Board(gameStateStore: GameStateStore): void {
+    const FLICKER_DELAY_MS = 100;
+
     // Component Attributes
     const clickedCellIndex: CellIndex[] = [];
 
     const boardContainer = document.querySelector('[data="board-container"]')! as HTMLElement;
+
+    const highlightCellByIndex = (cellIndex: CellIndex | null, isUserTurn: boolean) => {
+        const boardCells: HTMLElement[] = Array.from(document.querySelectorAll('[data-cell="cell"]')) as HTMLElement[];
+
+        boardCells.forEach((cell: HTMLElement) => {
+            if (isUserTurn) {
+                cell.classList.remove('board__cell--highlighted');
+            } else {
+                cell.classList.toggle('board__cell--highlighted', cellIndex === Number(cell.getAttribute('data-index')));
+            }
+        });
+    };
 
     fromEvent(boardContainer, 'click').subscribe((event) => {
         const clickedCell = (event.target as HTMLElement).closest('[data-cell="cell"]') as HTMLElement;
@@ -19,5 +32,22 @@ export function Board(cellsToHighlight: CellsToHighlight = []): board {
         clickedCellIndex.push(cellIndex);
     });
 
-    return {};
+    function delay(ms: number) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    gameStateStore.subscribe(async (gameState: GameState) => {
+        const currentCellIndex = gameState.pattern[gameState.pattern.length - 1];
+        const prevCellIndex = gameState.pattern[gameState.pattern.length - 2];
+        const isUserTurn = gameState.gamePhase === 'USER_TURN';
+
+        if (currentCellIndex === prevCellIndex) {
+            // Flicker: unhighlight, then highlight again using async/await
+            highlightCellByIndex(null, false);
+            await delay(FLICKER_DELAY_MS);
+            highlightCellByIndex(currentCellIndex, false);
+        } else {
+            highlightCellByIndex(currentCellIndex, isUserTurn);
+        }
+    });
 }
