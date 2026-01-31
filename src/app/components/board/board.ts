@@ -45,7 +45,7 @@ export function Board(gameStateStore: GameStateStore): void {
             // Flicker: unhighlight, then highlight again using async/await
             highlightCellByIndex(null, false);
             await delay(FLICKER_DELAY_MS);
-            highlightCellByIndex(currentCellIndex, false);
+            highlightCellByIndex(currentCellIndex, isUserTurn);
         } else {
             highlightCellByIndex(currentCellIndex, isUserTurn);
         }

@@ -1,5 +1,11 @@
 import { GameState, GameStateStore } from '../../types/types';
 
 export function MessageDisplayer(gameStateStore: GameStateStore): void {
-    gameStateStore.subscribe((gameState: GameState) => {});
+    const messageContainer = document.querySelector('[data-component="message-displayer"]')! as HTMLElement;
+
+    gameStateStore.subscribe((gameState: GameState) => {
+        if (gameState.gamePhase === 'SHOW_SEQUENCE') {
+            messageContainer.innerText = gameState.gameMessage.message;
+        }
+    });
 }
