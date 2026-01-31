@@ -46,7 +46,10 @@ export function MemoryGame(appRootNode: HTMLElement) {
                         pattern: [...gameStateStore.getState().pattern, patternCounter.cellIndex].filter((i): i is number => i !== null),
                         gameMessage: {
                             type: patternCounter.count === sizePattern - 1 ? 'USER_TURN' : 'LEVEL_INFO',
-                            message: patternCounter.count === sizePattern - 1 ? 'YOUR TURN' : `${sizePattern - 1} elements`,
+                            message:
+                                patternCounter.count !== null && patternCounter.count === sizePattern - 1
+                                    ? 'YOUR TURN'
+                                    : `${sizePattern - (patternCounter.count ?? 0)} elements`,
                         },
                         gamePhase: patternCounter.count !== null ? 'SHOW_SEQUENCE' : 'USER_TURN',
                     }),
