@@ -10,6 +10,18 @@ export function Board(gameStateStore: GameStateStore): void {
 
     const boardContainer = document.querySelector('[data="board-container"]')! as HTMLElement;
 
+    fromEvent(boardContainer, 'click').subscribe((event) => {
+        const clickedCell = (event.target as HTMLElement).closest('[data-cell="cell"]') as HTMLElement;
+
+        if (!clickedCell) return;
+
+        const cellIndex: CellIndex = Number(clickedCell.getAttribute('data-index'));
+
+        clickedCellIndex.push(cellIndex);
+    });
+
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const highlightCellByIndex = (cellIndex: CellIndex | null, isUserTurn: boolean) => {
         const boardCells: HTMLElement[] = Array.from(document.querySelectorAll('[data-cell="cell"]')) as HTMLElement[];
 
@@ -22,24 +34,17 @@ export function Board(gameStateStore: GameStateStore): void {
         });
     };
 
-    fromEvent(boardContainer, 'click').subscribe((event) => {
-        const clickedCell = (event.target as HTMLElement).closest('[data-cell="cell"]') as HTMLElement;
-
-        if (!clickedCell) return;
-
-        const cellIndex: CellIndex = Number(clickedCell.getAttribute('data-index'));
-
-        clickedCellIndex.push(cellIndex);
-    });
-
-    function delay(ms: number) {
-        return new Promise((resolve) => setTimeout(resolve, ms));
-    }
+    const setBoardInteractivity = (enabled: boolean) => {
+        boardContainer.style.pointerEvents = enabled ? 'auto' : 'none';
+    };
 
     gameStateStore.subscribe(async (gameState: GameState) => {
         const currentCellIndex = gameState.pattern[gameState.pattern.length - 1];
         const prevCellIndex = gameState.pattern[gameState.pattern.length - 2];
         const isUserTurn = gameState.gamePhase === 'USER_TURN';
+
+        // Enable board only during USER_TURN
+        setBoardInteractivity(isUserTurn);
 
         if (currentCellIndex === prevCellIndex) {
             // Flicker: unhighlight, then highlight again using async/await
