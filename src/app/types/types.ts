@@ -9,7 +9,7 @@ export type PatternCounter = {
     count: number | null;
 };
 
-export type GamePhase = 'INIT' | 'SHOW_SEQUENCE' | 'USER_TURN' | 'GAME_OVER';
+export type GamePhase = 'INIT' | 'SHOW_SEQUENCE' | 'USER_TURN' | 'USER_INPUT_VALIDATION' | 'GAME_OVER';
 
 export type GameMessage = { type: 'GAME_OVER'; message: string } | { type: 'USER_TURN'; message: string } | { type: 'LEVEL_INFO'; message: string };
 
