@@ -7,5 +7,9 @@ export function MessageDisplayer(gameStateStore: GameStateStore): void {
         if (gameState.gamePhase === 'SHOW_SEQUENCE') {
             messageContainer.innerText = gameState.gameMessage.message;
         }
+
+        if (gameState.gamePhase === 'GAME_OVER') {
+            messageContainer.innerText = gameState.gameMessage.message;
+        }
     });
 }

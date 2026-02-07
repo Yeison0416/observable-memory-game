@@ -2,13 +2,12 @@ import { CellIndex, GameStateStore, GameState } from '../../types/types';
 
 import { fromEvent } from 'rxjs';
 
-export function Board(gameStateStore: GameStateStore): void {
+export function Board(gameStateStore: GameStateStore, onCellClick: (cellIndex: CellIndex) => void): void {
     const FLICKER_DELAY_MS = 100;
-
-    // Component Attributes
-    const clickedCellIndex: CellIndex[] = [];
+    const FLICKER_DELAY_MS_LEVEL_CHANGE = 300;
 
     const boardContainer = document.querySelector('[data="board-container"]')! as HTMLElement;
+    const boardCells: HTMLElement[] = Array.from(document.querySelectorAll('[data-cell="cell"]')) as HTMLElement[];
 
     fromEvent(boardContainer, 'click').subscribe((event) => {
         const clickedCell = (event.target as HTMLElement).closest('[data-cell="cell"]') as HTMLElement;
@@ -17,19 +16,12 @@ export function Board(gameStateStore: GameStateStore): void {
 
         const cellIndex: CellIndex = Number(clickedCell.getAttribute('data-index'));
 
-        clickedCellIndex.push(cellIndex);
-
-        gameStateStore.setState({
-            playerInput: [...clickedCellIndex],
-            gamePhase: 'USER_INPUT_VALIDATION',
-        });
+        onCellClick(cellIndex);
     });
 
     const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
     const highlightCellByIndex = (cellIndex: CellIndex | null, isUserTurn: boolean) => {
-        const boardCells: HTMLElement[] = Array.from(document.querySelectorAll('[data-cell="cell"]')) as HTMLElement[];
-
         boardCells.forEach((cell: HTMLElement) => {
             if (isUserTurn) {
                 cell.classList.remove('board__cell--highlighted');
@@ -37,6 +29,10 @@ export function Board(gameStateStore: GameStateStore): void {
                 cell.classList.toggle('board__cell--highlighted', cellIndex === Number(cell.getAttribute('data-index')));
             }
         });
+    };
+
+    const highlightBoard = () => {
+        boardCells.forEach((cell: HTMLElement) => cell.classList.toggle('board__cell--highlighted'));
     };
 
     const setBoardInteractivity = (enabled: boolean) => {
@@ -62,6 +58,16 @@ export function Board(gameStateStore: GameStateStore): void {
             } else {
                 highlightCellByIndex(currentCellIndex, isUserTurn);
             }
+        }
+
+        if (gameState.gamePhase === 'GAME_OVER') {
+            setBoardInteractivity(false);
+        }
+
+        if (gameState.gamePhase === 'NEXT_LEVEL') {
+            highlightBoard();
+            await delay(FLICKER_DELAY_MS_LEVEL_CHANGE);
+            highlightBoard();
         }
     });
 }

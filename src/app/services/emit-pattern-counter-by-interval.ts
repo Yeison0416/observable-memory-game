@@ -5,8 +5,10 @@ import { pattern } from '../domain/pattern';
 import { Observable, concat, from, interval, of } from 'rxjs';
 import { delay, take, map, scan, switchMap } from 'rxjs/operators';
 
-export function getPatternSequence(gameState: GameState, sizePattern: number): Observable<PatternCounter> {
+export function getPatternSequence(gameState: GameState): Observable<PatternCounter> {
     const mathRandomFn = Math.random;
+    const gridSize = gameState.gridSize;
+    const lengthPattern = gameState.lengthPattern;
 
     const emitPatternCounterByInterval = (pattern: Pattern, emitInterval: number = 1000): Observable<PatternCounter> => {
         const pattern$ = interval(emitInterval).pipe(
@@ -19,7 +21,7 @@ export function getPatternSequence(gameState: GameState, sizePattern: number): O
         return concat(pattern$, endSignal$);
     };
 
-    const patternCounter$ = from(pattern(sizePattern, mathRandomFn, gameState.gridSize)).pipe(
+    const patternCounter$ = from(pattern(lengthPattern, mathRandomFn, gridSize)).pipe(
         scan((acc: Pattern, curr: number) => [...acc, curr], []),
         switchMap((randomSequence: Pattern) => emitPatternCounterByInterval(randomSequence)),
     );

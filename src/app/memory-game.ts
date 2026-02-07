@@ -1,6 +1,6 @@
 import template from './memory-game.hbs';
 
-import { GameState } from './types/types';
+import { CellIndex, GameState } from './types/types';
 
 import { Board } from './components/board/board';
 import { MessageDisplayer } from './components/message/message-displayer';
@@ -9,26 +9,42 @@ import { getPatternSequence } from './services/emit-pattern-counter-by-interval'
 
 import { getGameStateStore } from './state/game-state-store';
 
-import { getNextGameState, initialGameState } from './domain/rules';
+import { getNextGameState, initialGameState, appliedUSerInputGameState, getNextLevelGameState } from './domain/rules';
 
 export function MemoryGame(appRootNode: HTMLElement) {
-    const INIT_SIZE_PATTERN = 2;
-
     // Render the template
     appRootNode.innerHTML = template();
 
     // Create the game state store
     const gameStateStore = getGameStateStore(initialGameState());
 
+    // Cell click handler. Communication between Board component and Game State Store
+    const onCellClick = (cellIndex: CellIndex) => {
+        gameStateStore.setState({
+            playerInput: [...gameStateStore.getState().playerInput, cellIndex],
+            gamePhase: 'USER_INPUT_VALIDATION',
+        });
+
+        gameStateStore.setState(appliedUSerInputGameState(gameStateStore.getState(), cellIndex));
+
+        if (gameStateStore.getState().gamePhase === 'NEXT_LEVEL') {
+            const nextLevelState = getNextLevelGameState(gameStateStore.getState());
+            gameStateStore.setState(nextLevelState);
+            patternSequence(gameStateStore.getState());
+        }
+    };
+
+    const patternSequence = (gameState: GameState) =>
+        getPatternSequence(gameState).subscribe(({ cellIndex, count }) => {
+            gameStateStore.setState(getNextGameState(gameStateStore.getState(), cellIndex, count));
+        });
+
     // Component instances
-    Board(gameStateStore);
+    Board(gameStateStore, onCellClick);
     MessageDisplayer(gameStateStore);
 
     function startGame() {
-        getPatternSequence(gameStateStore.getState(), INIT_SIZE_PATTERN).subscribe(({ cellIndex, count }) => {
-            const nextGameState = getNextGameState(gameStateStore.getState(), cellIndex, count, INIT_SIZE_PATTERN);
-            gameStateStore.setState(nextGameState);
-        });
+        patternSequence(gameStateStore.getState());
     }
 
     const state = {

@@ -1,5 +1,6 @@
 export type CellIndex = number;
 export type GridSize = number;
+export type LengthPattern = number;
 
 export type PlayerInput = ReadonlyArray<CellIndex>;
 export type Pattern = ReadonlyArray<CellIndex>;
@@ -9,7 +10,7 @@ export type PatternCounter = {
     count: number | null;
 };
 
-export type GamePhase = 'INIT' | 'SHOW_SEQUENCE' | 'USER_TURN' | 'USER_INPUT_VALIDATION' | 'GAME_OVER';
+export type GamePhase = 'INIT' | 'SHOW_SEQUENCE' | 'USER_TURN' | 'USER_INPUT_VALIDATION' | 'NEXT_LEVEL' | 'GAME_OVER';
 
 export type GameMessage = { type: 'GAME_OVER'; message: string } | { type: 'USER_TURN'; message: string } | { type: 'LEVEL_INFO'; message: string };
 
@@ -20,6 +21,7 @@ export type GameStateStore = {
 };
 
 export type GameState = {
+    lengthPattern: LengthPattern;
     gridSize: GridSize;
     level: number;
     pattern: Pattern;
