@@ -100,32 +100,20 @@ An advanced, modular memory game built with **TypeScript**, **RxJS**, **Handleba
 
 ### Run Development Server
 
+`npm install`
+
+**Run the dev server**
+
 `npm start`
 
-- Opens a local dev server
+This will start:
 
-- Supports live reloading for scripts, styles, and templates
+* Webpack Dev Server
+* TypeScript type checking
 
-### Build for Production
+# Demo
 
-`npm run build`
 
-- Generates optimized bundle in dist/
+https://github.com/user-attachments/assets/a97dddd8-8c5c-4b85-b4c8-eca74c3a23fc
 
-- Compiles TypeScript, SCSS, and Handlebars templates
 
-## Usage
-
-1. Add your TypeScript code inside src/scripts.
-
-2. Place SCSS styles in src/styles.
-
-3. Add Handlebars templates in src/templates.
-
-4. Import and use templates in TypeScript like this:
-
-```
-import template from './templates/my-template.hbs';
-const html = template({ key: 'value' });
-document.body.innerHTML = html;
-```
