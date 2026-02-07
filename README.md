@@ -3,6 +3,8 @@
 An advanced, modular memory game built with **TypeScript**, **RxJS**, **Handlebars**, and **SCSS/SASS**. This project demonstrates high software engineering standards, including strict separation of concerns, functional and reactive programming, and testable architecture.
 
 ---
+## Game Description
+The Observable Memory Game challenges players to remember and repeat sequences of highlighted squares. Each round, the game displays a pattern for the player to observe, then prompts them to reproduce it by clicking the correct squares in order. With each successful round, the sequence grows longer, testing the player’s memory and attention. The game features clear feedback, level progression, and a modern, interactive UI.
 
 ## Architecture & Major Strengths
 
